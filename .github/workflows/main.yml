@@ -1,0 +1,53 @@
+name: Test, Build, Publish
+
+# On a push, merge, or pull request to the main branch:
+# This Github Actions workflow file will run any tests found in the test_for_brett.Test directory.
+# If the tests are successful, it will then Build the project in the test_for_brett directory, run dotnet publish, and upload the result to Github.
+# This file must be placed inside the .github/workflows folders at the root of the repo in order for automated actions to be triggered.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Test:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore ./test_for_brett.Test/
+    - name: Test
+      run: dotnet test ./test_for_brett.Test/ --no-restore
+
+  Build-and-Publish:
+
+    runs-on: ubuntu-22.04
+
+    needs: Test
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore ./test_for_brett/ 
+    - name: Build for Release
+      run: dotnet build ./test_for_brett/ --no-restore --configuration Release
+
+    - name: dotnet publish
+      run: dotnet publish ./test_for_brett/ --no-build -c Release     
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: ./test_for_brett/bin/Release/
