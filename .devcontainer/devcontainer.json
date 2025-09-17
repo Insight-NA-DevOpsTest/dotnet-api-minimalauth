@@ -1,0 +1,46 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+	"name": "C# (.NET)",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000"
+        },
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/dotnet:2": { "version": "8.0" },
+		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.powershell",
+				"DotJoshJohnson.xml",
+				"k--kato.docomment",
+				"adrianwilczynski.user-secrets",
+				"ms-dotnettools.csdevkit"
+			],
+			"settings": {
+				"[csharp]": {
+					"editor.maxTokenizationLineLength": 2500,
+					"editor.formatOnSave": true,
+					"editor.formatOnSaveMode": "file"
+				}
+			}
+		}
+	},
+	"postCreateCommand": {
+		"Pester": "sudo pwsh -Command 'Install-Module Pester -Force -Scope AllUsers'",
+		"Act": "brew install act",
+		"GitVersion": "dotnet tool install --global GitVersion.Tool --version 6.0.2"
+	},
+	// Set the remote user used to connect. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "vscode"
+}
+
