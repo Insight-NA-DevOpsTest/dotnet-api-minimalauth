@@ -1,0 +1,26 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /App
+
+# Copy everything
+COPY . ./
+# Restore as distinct layers
+RUN dotnet restore
+# Build and publish a release
+RUN dotnet publish -c Release -o out
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+EXPOSE 80
+
+# Create the working directory and set permissions for the application
+RUN mkdir /home/app/net
+WORKDIR /home/app/net
+
+# Switch to the new user
+USER appsvc
+
+# Copy the binaries to the directory we created above
+COPY --from=build-env /App/out /home/appsvc/net/
+
+# Start it up!
+ENTRYPOINT ["dotnet", "test_for_brett.dll"]
